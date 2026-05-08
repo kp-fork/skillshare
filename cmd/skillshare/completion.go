@@ -8,6 +8,68 @@ import (
 	"skillshare/internal/ui"
 )
 
+type shellDef struct {
+	script      string
+	installPath func(home string) string
+	postInstall func(destPath string)
+}
+
+var shells = map[string]shellDef{
+	"bash": {
+		script: bashCompletionScript,
+		installPath: func(home string) string {
+			return filepath.Join(home, ".local", "share", "bash-completion", "completions", "skillshare")
+		},
+		postInstall: func(p string) {
+			ui.Info("Restart your shell or run:")
+			ui.Info("  source %s", p)
+		},
+	},
+	"zsh": {
+		script: zshCompletionScript,
+		installPath: func(home string) string {
+			return filepath.Join(home, ".zsh", "completions", "_skillshare")
+		},
+		postInstall: func(_ string) {
+			ui.Info("Add the following to your .zshrc (if not already present):")
+			ui.Info("  fpath=(~/.zsh/completions $fpath)")
+			ui.Info("  autoload -Uz compinit && compinit")
+			ui.Info("Then restart your shell or run: exec zsh")
+		},
+	},
+	"fish": {
+		script: fishCompletionScript,
+		installPath: func(home string) string {
+			return filepath.Join(home, ".config", "fish", "completions", "skillshare.fish")
+		},
+		postInstall: func(_ string) {
+			ui.Info("Completions will be available in new fish sessions automatically.")
+		},
+	},
+	"powershell": {
+		script: powershellCompletionScript,
+		installPath: func(home string) string {
+			return filepath.Join(home, ".config", "powershell", "completions", "skillshare.ps1")
+		},
+		postInstall: func(p string) {
+			ui.Info("Add the following to your PowerShell profile:")
+			ui.Info("  . %s", p)
+			ui.Info("To find your profile path, run: echo $PROFILE")
+		},
+	},
+	"nushell": {
+		script: nushellCompletionScript,
+		installPath: func(home string) string {
+			return filepath.Join(home, ".config", "nushell", "completions", "skillshare.nu")
+		},
+		postInstall: func(p string) {
+			ui.Info("Add the following to your Nushell config:")
+			ui.Info("  source %s", p)
+			ui.Info("Or add it to $nu.config-path")
+		},
+	},
+}
+
 func cmdCompletion(args []string) error {
 	var shell string
 	var install bool
@@ -31,85 +93,32 @@ func cmdCompletion(args []string) error {
 		return nil
 	}
 
-	var script string
-	switch shell {
-	case "bash":
-		script = bashCompletionScript
-	case "zsh":
-		script = zshCompletionScript
-	case "fish":
-		script = fishCompletionScript
-	case "powershell":
-		script = powershellCompletionScript
-	case "nushell":
-		script = nushellCompletionScript
-	default:
+	def, ok := shells[shell]
+	if !ok {
 		return fmt.Errorf("unsupported shell: %s (supported: bash, zsh, fish, powershell, nushell)", shell)
 	}
 
 	if !install {
-		fmt.Print(script)
+		fmt.Print(def.script)
 		return nil
 	}
 
-	return installCompletion(shell, script)
-}
-
-func installCompletion(shell, script string) error {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("cannot determine home directory: %w", err)
 	}
 
-	var destPath string
-	switch shell {
-	case "bash":
-		destPath = filepath.Join(home, ".local", "share", "bash-completion", "completions", "skillshare")
-	case "zsh":
-		destPath = filepath.Join(home, ".zsh", "completions", "_skillshare")
-	case "fish":
-		destPath = filepath.Join(home, ".config", "fish", "completions", "skillshare.fish")
-	case "powershell":
-		destPath = filepath.Join(home, ".config", "powershell", "completions", "skillshare.ps1")
-	case "nushell":
-		destPath = filepath.Join(home, ".config", "nushell", "completions", "skillshare.nu")
-	}
-
+	destPath := def.installPath(home)
 	dir := filepath.Dir(destPath)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("cannot create directory %s: %w", dir, err)
 	}
-
-	if err := os.WriteFile(destPath, []byte(script), 0o644); err != nil {
+	if err := os.WriteFile(destPath, []byte(def.script), 0o644); err != nil {
 		return fmt.Errorf("cannot write completion script: %w", err)
 	}
 
 	ui.Success("Completion script installed to %s", destPath)
-	fmt.Println()
-
-	switch shell {
-	case "bash":
-		ui.Info("Restart your shell or run:")
-		fmt.Printf("  source %s\n", destPath)
-	case "zsh":
-		ui.Info("Add the following to your .zshrc (if not already present):")
-		fmt.Printf("  fpath=(~/.zsh/completions $fpath)\n")
-		fmt.Printf("  autoload -Uz compinit && compinit\n")
-		fmt.Println()
-		ui.Info("Then restart your shell or run: exec zsh")
-	case "fish":
-		ui.Info("Completions will be available in new fish sessions automatically.")
-	case "powershell":
-		ui.Info("Add the following to your PowerShell profile:")
-		fmt.Printf("  . %s\n", destPath)
-		fmt.Println()
-		ui.Info("To find your profile path, run: echo $PROFILE")
-	case "nushell":
-		ui.Info("Add the following to your Nushell config:")
-		fmt.Printf("  source %s\n", destPath)
-		fmt.Println()
-		ui.Info("Or add it to $nu.config-path")
-	}
+	def.postInstall(destPath)
 
 	return nil
 }

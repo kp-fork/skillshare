@@ -297,6 +297,10 @@ export extern "skillshare target" [
     --add-exclude: string    # Add exclude filter
     --remove-include: string # Remove include filter
     --remove-exclude: string # Remove exclude filter
+    --add-agent-include: string    # Add agent include filter
+    --add-agent-exclude: string    # Add agent exclude filter
+    --remove-agent-include: string # Remove agent include filter
+    --remove-agent-exclude: string # Remove agent exclude filter
     --project(-p)            # Use project-level config
     --global(-g)             # Use global config
     --help(-h)               # Show help
@@ -353,7 +357,7 @@ export extern "skillshare trash" [
 
 # Audit
 export extern "skillshare audit" [
-    target?: string@"nu-complete skillshare audit"
+    subcommand?: string@"nu-complete skillshare audit"
     --init-rules             # Initialize audit rules
     --json                   # JSON output
     --format: string@"nu-complete skillshare audit-format"
