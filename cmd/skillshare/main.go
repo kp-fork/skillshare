@@ -44,9 +44,10 @@ var commands = map[string]func([]string) error{
 	"log":       cmdLog,
 	"ui":        cmdUI,
 	"tui":       cmdTUIToggle,
-	"extras":    cmdExtras,
-	"enable":    cmdEnable,
-	"disable":   cmdDisable,
+	"extras":     cmdExtras,
+	"enable":     cmdEnable,
+	"disable":    cmdDisable,
+	"completion": cmdCompletion,
 }
 
 func main() {
@@ -265,6 +266,7 @@ func printUsage() {
 	cmd("tui", "[on|off]", "Toggle interactive TUI mode")
 	cmd("ui", "", "Launch web dashboard")
 	cmd("doctor", "", "Check environment and diagnose issues")
+	cmd("completion", "<shell>", "Generate shell completion scripts")
 	cmd("version", "", "Show version")
 	cmd("help", "", "Show this help")
 	fmt.Println()
