@@ -87,7 +87,7 @@ skillshare sync -g       # Force global mode
 ├── .skillshare/
 │   ├── config.yaml              # Targets + settings (incl. extras)
 │   ├── .metadata.json           # Remote skills list (auto-managed)
-│   ├── .gitignore               # Ignores logs/, trash/, and cloned remote/tracked skill dirs
+│   ├── .gitignore               # Ignores logs/, trash/, backups/, and cloned remote/tracked skill dirs
 │   ├── extras/                  # Extras source directories
 │   │   └── rules/               # e.g. extras init rules --target .claude/rules -p
 │   │       └── coding.md
@@ -176,7 +176,7 @@ Project mode has some intentional limitations:
 | Merge sync mode | ✓ | Default, per-skill symlinks |
 | Copy sync mode | ✓ | Per-target via `skillshare target <name> --mode copy -p` |
 | Symlink sync mode | ✓ | Per-target via `skillshare target <name> --mode symlink -p` |
-| `--track` repos | ✓ | Cloned to `.skillshare/skills/_repo/`, added to `.gitignore` (`logs/` and `trash/` are also ignored by default) |
+| `--track` repos | ✓ | Cloned to `.skillshare/skills/_repo/`, added to `.gitignore` (`logs/`, `trash/`, and `backups/` are also ignored by default) |
 | `--discover` | ✓ | Detect and add new targets to existing project config |
 | `push` / `pull` | ✗ | Use git directly on the project repo |
 | `collect` | ✓ | Collect local skills from project targets to `.skillshare/skills/` |

@@ -553,7 +553,7 @@ func ensureProjectGitignore(root string, gitignoreConfig bool) error {
 	}
 
 	// Always ignore operational directories to avoid committing noise.
-	if err := install.UpdateGitIgnoreBatch(gitignoreDir, []string{"logs", "trash"}); err != nil {
+	if err := install.UpdateGitIgnoreBatch(gitignoreDir, []string{"logs", "trash", "backups"}); err != nil {
 		return fmt.Errorf("failed to update .skillshare/.gitignore: %w", err)
 	}
 
