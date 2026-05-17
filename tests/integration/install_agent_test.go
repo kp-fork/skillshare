@@ -259,7 +259,7 @@ targets: {}
 	if err != nil {
 		t.Fatalf("parse source: %v", err)
 	}
-	trackedRepoDir := filepath.Join(agentsDir, "_"+source.TrackName())
+	trackedRepoDir := filepath.Join(agentsDir, "_"+source.Name)
 	if _, err := os.Stat(filepath.Join(trackedRepoDir, ".git")); err != nil {
 		t.Fatalf("expected tracked agent repo .git to exist: %v", err)
 	}
