@@ -101,7 +101,7 @@ These are auto-detected during `skillshare init`:
 <tr id="target-bob"><td>bob</td><td><code>&#126;/.bob/skills</code></td><td><code>.bob/skills</code></td></tr>
 <tr id="target-claude"><td>claude</td><td><code>&#126;/.claude/skills</code></td><td><code>.claude/skills</code></td></tr>
 <tr id="target-codearts"><td>codearts</td><td><code>&#126;/.codeartsdoer/skills</code></td><td><code>.codeartsdoer/skills</code></td></tr>
-<tr id="target-cline"><td>cline</td><td><code>&#126;/.agents/skills</code></td><td><code>.agents/skills</code></td></tr>
+<tr id="target-cline"><td>cline</td><td><code>&#126;/.cline/skills</code></td><td><code>.cline/skills</code></td></tr>
 <tr id="target-codebuddy"><td>codebuddy</td><td><code>&#126;/.codebuddy/skills</code></td><td><code>.codebuddy/skills</code></td></tr>
 <tr id="target-codestudio"><td>codestudio</td><td><code>&#126;/.codestudio/skills</code></td><td><code>.codestudio/skills</code></td></tr>
 <tr id="target-comate"><td>comate</td><td><code>&#126;/.comate/skills</code></td><td><code>.comate/skills</code></td></tr>
@@ -159,7 +159,7 @@ These are auto-detected during `skillshare init`:
 </table>
 
 :::info Universal target
-The **universal** target (`&#126;/.agents/skills`) is a shared agent directory that multiple AI CLIs can read from. It is auto-detected during `skillshare init` when any other agent is found. In project mode, `amp`, `cline`, `codex`, `cursor`, `dexto`, `kimi`, `purecode`, `replit`, `warp`, and `witsy` share the same `.agents/skills` path and are grouped under `universal` automatically.
+The **universal** target (`&#126;/.agents/skills`) is a shared agent directory that multiple AI CLIs can read from. It is auto-detected during `skillshare init` when any other agent is found. In project mode, `amp`, `codex`, `cursor`, `dexto`, `kimi`, `purecode`, `replit`, `warp`, and `witsy` share the same `.agents/skills` path and are grouped under `universal` automatically.
 
 This is the same path used by the [npx skills CLI](https://github.com/vercel-labs/skills). See [FAQ: Using universal alongside npx skills](/docs/troubleshooting/faq#using-universal-alongside-npx-skills) for coexistence details.
 :::

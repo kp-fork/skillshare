@@ -52,8 +52,8 @@ targets:
     aliases: [codearts-agent]
   - name: cline
     skills:
-      global: "~/.agents/skills"
-      project: ".agents/skills"
+      global: "~/.cline/skills"
+      project: ".cline/skills"
   - name: codebuddy
     skills:
       global: "~/.codebuddy/skills"
