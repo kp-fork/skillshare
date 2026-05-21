@@ -92,3 +92,10 @@
 - **Discovery**: In a full run of 22 runbooks, the first clean run had 2 failures. But the second run (same ssenv, re-running mdproof) had 10 failures — all due to accumulated state from the first run (1257 trash items, stale registry entries, leftover extras). Even within a single full run, alphabetically-later runbooks can fail because of state left by earlier ones
 - **Fix**: (1) Each runbook should clean up its own footprint in Step 1 (rm -rf /tmp/ paths, clear trash, reset config sections). (2) For authoritative results, run each runbook in its own fresh ssenv. (3) Full-directory runs are useful as smoke tests but failures should be re-verified in isolation before treating them as real bugs
 - **Runbooks affected**: extras_refactor_json (file_count mismatch from extras_commands leftovers), gitlab_hosts_config (trash from previous runbooks broke go test), registry_yaml_split (/tmp/ state from prior runs)
+
+### [assertion] `ss sync --json` has no `.errors` field — use `.linked` / `.details`
+
+- **Context**: `global_sources_map_runbook` step 5 asserted `jq: .errors == 0` on `ss sync --json` to verify a successful sync. The assertion failed because the output schema doesn't include an `errors` key at all (jq returns `null`, which compares unequal to `0`)
+- **Discovery**: `ss sync --json` emits `{targets, linked, local, updated, pruned, ignored_count, ignored_skills, dry_run, duration, details[], context_cost}`. Failure is signalled by the process exit code and per-target details, not by a top-level `errors` field. Many AI-generated assertions assume a generic `.errors == 0` pattern from REST APIs — that pattern doesn't apply here
+- **Fix**: Assert positive evidence of the sync outcome instead. Examples: `jq: .linked == <N>` for "N skills got linked", `jq: .details[0].name == "<target>"` for target-level reporting, `jq: .updated == 0` for "nothing changed in this re-run". Pair with `exit_code: 0` for the failure-case guard
+- **Runbooks affected**: global_sources_map_runbook.md (step 5 fixed before merging)
