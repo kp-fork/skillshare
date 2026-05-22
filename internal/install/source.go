@@ -315,7 +315,7 @@ func parseGitSSH(matches []string, source *Source) (*Source, error) {
 		source.Subdir = subdir
 		source.Name = filepath.Base(subdir)
 	} else {
-		source.Name = repo
+		source.Name = filepath.Base(repo)
 	}
 
 	return source, nil

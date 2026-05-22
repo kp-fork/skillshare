@@ -216,6 +216,12 @@ func TestParseSource_GitSSH(t *testing.T) {
 			wantName:     "repo",
 		},
 		{
+			name:         "gitlab ssh nested subgroup",
+			input:        "git@gitlab.example.com:org/subgroup/my-skills.git",
+			wantCloneURL: "git@gitlab.example.com:org/subgroup/my-skills.git",
+			wantName:     "my-skills",
+		},
+		{
 			name:         "ssh without .git",
 			input:        "git@github.com:user/my-skill",
 			wantCloneURL: "git@github.com:user/my-skill.git",
