@@ -59,11 +59,15 @@ Local changes detected
 
 Solutions:
 ```bash
-# Option 1: Push your changes first
+# Option 1: Commit locally first, without pushing
+skillshare commit -m "Local changes"
+skillshare pull
+
+# Option 2: Push your changes first
 skillshare push
 skillshare pull
 
-# Option 2: Stash your changes
+# Option 3: Stash your changes
 cd ~/.config/skillshare/skills
 git stash
 skillshare pull
@@ -125,6 +129,7 @@ skillshare push -m "Add new skill"
 
 ## See Also
 
+- [commit](/docs/reference/commands/commit) — Commit locally without pushing
 - [push](/docs/reference/commands/push) — Push to remote
 - [sync](/docs/reference/commands/sync) — Manual sync without pull
 - [Cross-Machine Sync](/docs/how-to/sharing/cross-machine-sync) — Full setup

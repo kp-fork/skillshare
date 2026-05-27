@@ -9,6 +9,23 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.19.24] - 2026-05-27
+
+### New Features
+
+#### Local skill checkpoints
+
+- **`skillshare commit`** — create a local git commit for source skills without pushing to the remote. This is useful when iterating locally and wanting a restore point before you are ready to share changes across machines. It stages all source changes and commits them with the provided message, and it works even when no git remote is configured.
+  ```bash
+  skillshare commit -m "Update writing skill"
+  skillshare commit --dry-run
+  ```
+- **Dashboard local commit action** — the Git Sync page now has a **Commit locally** button alongside **Push** and **Pull**. It uses the same commit message and dry-run preview area, but only creates the local commit and never pushes.
+
+### Bug Fixes
+
+- **Dashboard update results stay current after updating** — after updating skills from the dashboard, successfully updated or already-current items are now marked **Up to date** and keep their latest check status instead of falling back to **Unchecked**.
+
 ## [0.19.23] - 2026-05-26
 
 ### Bug Fixes

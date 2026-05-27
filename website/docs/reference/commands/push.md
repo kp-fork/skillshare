@@ -6,6 +6,8 @@ sidebar_position: 1
 
 Commit and push source to git remote.
 
+Use [`commit`](./commit.md) instead when you only want a local checkpoint without pushing.
+
 ```bash
 skillshare push                  # Auto-generated message
 skillshare push -m "Add pdf"     # Custom message
@@ -17,6 +19,8 @@ skillshare push --dry-run        # Preview
 - Share skill changes with your other machines via git
 - Back up your skills to a remote repository
 - After editing skills, commit and push in one command
+
+If you want to save a local checkpoint without sharing it yet, use [`skillshare commit`](./commit.md).
 
 ## What Happens
 
@@ -106,6 +110,7 @@ skillshare pull    # Gets changes and syncs
 
 ## See Also
 
+- [commit](/docs/reference/commands/commit) — Commit locally without pushing
 - [pull](/docs/reference/commands/pull) — Pull from remote
 - [sync](/docs/reference/commands/sync) — Sync to local targets
 - [Cross-Machine Sync](/docs/how-to/sharing/cross-machine-sync) — Full setup

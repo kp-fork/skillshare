@@ -40,7 +40,7 @@
 </p>
 
 > [!NOTE]
-> **Latest**: [v0.19.12](https://github.com/runkids/skillshare/releases/tag/v0.19.12) — project `skills:` in config.yaml now preserved (team-sharing fix). [All releases →](https://github.com/runkids/skillshare/releases)
+> **Latest**: [v0.19.24](https://github.com/runkids/skillshare/releases/tag/v0.19.24) — `skillshare commit` creates local git checkpoints without pushing; the Git Sync page now supports **Commit locally**. [All releases →](https://github.com/runkids/skillshare/releases)
 
 ## Why skillshare
 
@@ -203,7 +203,14 @@ skillshare extras collect rules       # collect local files back to source
 skillshare completion bash --install   # also: zsh, fish, powershell, nushell
 ```
 
-**Web dashboard** —visual control panel
+**Local checkpoints** — commit source changes without pushing
+
+```bash
+skillshare commit -m "Update review skill"
+skillshare commit --dry-run
+```
+
+**Web dashboard** — visual control panel
 
 ```bash
 skillshare ui
