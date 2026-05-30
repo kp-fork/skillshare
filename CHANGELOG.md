@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.20.0] - 2026-05-29
+## [0.20.0] - 2026-05-30
 
 ### New Features
 
@@ -34,6 +34,9 @@
 ### Bug Fixes
 
 - **Hardened git remote handling** — remote URLs beginning with `-` (which git could misinterpret as a flag) are now rejected when setting or adding a remote, including via `skillshare init --remote`.
+- **Dashboard pull keeps skill paths correct with scoped git roots** — pulling from a `root`, `agents`, or `extras` git scope no longer causes the follow-up sync to flatten paths such as `skills/foo` into the wrong skill name.
+- **Transformed extras no longer show false drift** — dashboard diff/status checks now compare transformed filenames (for example `.md` → `.toml`) consistently, and missing extension definitions surface as warnings instead of silently falling back.
+- **Safer reference transforms** — bundled TOML transforms now escape control characters correctly and stop hung transform commands instead of blocking sync indefinitely.
 
 ## [0.19.24] - 2026-05-27
 
