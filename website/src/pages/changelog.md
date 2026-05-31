@@ -9,6 +9,24 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.20.2] - 2026-05-31
+
+### New Features
+
+#### Doctor remediation suggestions
+
+- **`skillshare doctor` now suggests how to fix what it flags** — when doctor detects targets writing to a shared path, or one target's runtime discovering another target's skills, it prints a remediation suggestion next to the warning instead of only reporting the overlap. Suggestions are also included in `doctor --json` under a new `suggestions` field.
+- **Suggestions point at a ready-to-run target removal command** — overlap suggestions now include the exact command to preview removing a duplicate target:
+  ```bash
+  skillshare target remove <name> --global --dry-run
+  ```
+- **Health Check page surfaces suggestions** — the dashboard Health Check page renders each check's remediation suggestions inside its expandable detail block, localized across all supported languages.
+
+### Bug Fixes
+
+- **GitHub Enterprise Cloud data residency hosts are now recognized** — repositories on `*.ghe.com` tenants are detected as GitHub over both HTTPS and SSH, and the GitHub API base is resolved as `https://api.<tenant>.ghe.com`, so installing and updating from data residency accounts works.
+- **SSH remote URLs with a custom username now work** — clone URLs such as `acme@acme.ghe.com:org/repo.git` (any username, not only `git`) are parsed and normalized correctly when installing and updating.
+
 ## [0.20.1] - 2026-05-31
 
 ### Bug Fixes
