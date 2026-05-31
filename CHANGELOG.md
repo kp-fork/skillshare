@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.1] - 2026-05-31
+
+### Bug Fixes
+
+- **Codex agent transforms reject incomplete agents** — the bundled `codex-agents` extension now fails clearly when the resolved `name`, `description`, or Markdown body is blank. Missing `name` still falls back to the source filename, and the extension docs link to Codex's custom agent schema for the required fields.
+- **Dashboard Extras sync shows extension errors** — when an extras transform fails, the Extras page toast now shows the first file-level error instead of only an error count, so users can fix the specific source file without opening logs.
+
 ## [0.20.0] - 2026-05-30
 
 ### New Features
