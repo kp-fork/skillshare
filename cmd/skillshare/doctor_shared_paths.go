@@ -55,7 +55,7 @@ func checkSharedTargetPaths(cfg *config.Config, result *doctorResult) {
 	for _, c := range collisions {
 		ui.Warning("Shared path %s ← %s", c.path, strings.Join(c.targets, ", "))
 		details = append(details, fmt.Sprintf("%s ← %s", c.path, strings.Join(c.targets, ", ")))
-		suggestion := fmt.Sprintf("Choose one authoritative target for %s; disable or reconfigure the others: %s", c.path, strings.Join(c.targets, ", "))
+		suggestion := fmt.Sprintf("Choose one authoritative target for %s and disable or reconfigure the rest (currently: %s)", c.path, strings.Join(c.targets, ", "))
 		fmt.Println(ui.DimText("    suggestion: " + suggestion))
 		suggestions = append(suggestions, suggestion)
 		result.addWarning()
@@ -161,14 +161,14 @@ func checkCrossTargetDiscovery(cfg *config.Config, result *doctorResult, isProje
 		sort.Strings(writers)
 
 		ui.Warning("%s will see content from: %s", so.scanner, strings.Join(writers, ", "))
-		suggestion := fmt.Sprintf("Choose one authoritative route for %s-visible skills; disable or reconfigure overlapping writer target(s): %s", so.scanner, strings.Join(writers, ", "))
-		fmt.Println(ui.DimText("    suggestion: " + suggestion))
-		suggestions = append(suggestions, suggestion)
 		for _, p := range so.paths {
 			fmt.Println(ui.DimText(fmt.Sprintf("    %s ← %s", p.sharedPath, strings.Join(p.writers, ", "))))
 			details = append(details, fmt.Sprintf("%s (%s) also scans %s ← %s",
 				so.scanner, so.scannerPath, p.sharedPath, strings.Join(p.writers, ", ")))
 		}
+		suggestion := fmt.Sprintf("Choose one authoritative route for %s-visible skills; disable or reconfigure overlapping writer target(s): %s", so.scanner, strings.Join(writers, ", "))
+		fmt.Println(ui.DimText("    suggestion: " + suggestion))
+		suggestions = append(suggestions, suggestion)
 		result.addWarning()
 	}
 
