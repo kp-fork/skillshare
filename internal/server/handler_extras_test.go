@@ -728,3 +728,96 @@ func TestHandleExtrasDiff_TransformOutputExt(t *testing.T) {
 		t.Errorf("expected synced=true after .md→.toml sync, got drift: %+v", resp.Extras[0].Items)
 	}
 }
+
+// TestHandleExtrasAddTarget adds a target to an existing extra via POST.
+func TestHandleExtrasAddTarget(t *testing.T) {
+	tgt1 := t.TempDir()
+	extras := []config.ExtraConfig{{
+		Name:    "rules",
+		Targets: []config.ExtraTargetConfig{{Path: tgt1, Mode: "merge"}},
+	}}
+	s, _ := newTestServerWithExtras(t, extras, "")
+
+	tgt2 := t.TempDir()
+	body := `{"path":"` + tgt2 + `","mode":"copy"}`
+	req := httptest.NewRequest(http.MethodPost, "/api/extras/rules/targets", strings.NewReader(body))
+	rr := httptest.NewRecorder()
+	s.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	s.mu.RLock()
+	got := s.cfg.Extras
+	s.mu.RUnlock()
+	if len(got) != 1 || len(got[0].Targets) != 2 {
+		t.Fatalf("expected 2 targets, got %+v", got)
+	}
+	if got[0].Targets[1].Path != tgt2 || got[0].Targets[1].Mode != "copy" {
+		t.Errorf("new target wrong: %+v", got[0].Targets[1])
+	}
+}
+
+// TestHandleExtrasAddTarget_Duplicate rejects an existing target path.
+func TestHandleExtrasAddTarget_Duplicate(t *testing.T) {
+	tgt1 := t.TempDir()
+	extras := []config.ExtraConfig{{
+		Name:    "rules",
+		Targets: []config.ExtraTargetConfig{{Path: tgt1, Mode: "merge"}},
+	}}
+	s, _ := newTestServerWithExtras(t, extras, "")
+
+	body := `{"path":"` + tgt1 + `","mode":"merge"}`
+	req := httptest.NewRequest(http.MethodPost, "/api/extras/rules/targets", strings.NewReader(body))
+	rr := httptest.NewRecorder()
+	s.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusConflict {
+		t.Fatalf("expected 409, got %d: %s", rr.Code, rr.Body.String())
+	}
+}
+
+// TestHandleExtrasRemoveTarget removes one of two targets via DELETE.
+func TestHandleExtrasRemoveTarget(t *testing.T) {
+	tgt1, tgt2 := t.TempDir(), t.TempDir()
+	extras := []config.ExtraConfig{{
+		Name: "rules",
+		Targets: []config.ExtraTargetConfig{
+			{Path: tgt1, Mode: "merge"},
+			{Path: tgt2, Mode: "merge"},
+		},
+	}}
+	s, _ := newTestServerWithExtras(t, extras, "")
+
+	body := `{"path":"` + tgt2 + `"}`
+	req := httptest.NewRequest(http.MethodDelete, "/api/extras/rules/targets", strings.NewReader(body))
+	rr := httptest.NewRecorder()
+	s.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	s.mu.RLock()
+	got := s.cfg.Extras
+	s.mu.RUnlock()
+	if len(got[0].Targets) != 1 || got[0].Targets[0].Path != tgt1 {
+		t.Errorf("expected only tgt1 to remain, got %+v", got[0].Targets)
+	}
+}
+
+// TestHandleExtrasRemoveTarget_Last rejects removing the only target.
+func TestHandleExtrasRemoveTarget_Last(t *testing.T) {
+	tgt1 := t.TempDir()
+	extras := []config.ExtraConfig{{
+		Name:    "rules",
+		Targets: []config.ExtraTargetConfig{{Path: tgt1, Mode: "merge"}},
+	}}
+	s, _ := newTestServerWithExtras(t, extras, "")
+
+	body := `{"path":"` + tgt1 + `"}`
+	req := httptest.NewRequest(http.MethodDelete, "/api/extras/rules/targets", strings.NewReader(body))
+	rr := httptest.NewRecorder()
+	s.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d: %s", rr.Code, rr.Body.String())
+	}
+}

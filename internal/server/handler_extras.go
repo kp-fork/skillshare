@@ -731,3 +731,135 @@ func (s *Server) handleExtrasDelete(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, map[string]any{"success": true, "name": name})
 }
+
+// handleExtrasAddTarget — POST /api/extras/{name}/targets
+// Adds a new target to an existing extra. Config-only (no sync).
+func (s *Server) handleExtrasAddTarget(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	name := r.PathValue("name")
+
+	var body struct {
+		Path    string `json:"path"`
+		Mode    string `json:"mode"`
+		Flatten bool   `json:"flatten"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid JSON body")
+		return
+	}
+	if body.Path == "" {
+		writeError(w, http.StatusBadRequest, "path is required")
+		return
+	}
+	if err := config.ValidateExtraMode(body.Mode); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := config.ValidateExtraFlatten(body.Flatten, body.Mode); err != nil {
+		writeError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	extras := s.extrasConfig()
+	idx := -1
+	for i := range extras {
+		if extras[i].Name == name {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
+		writeError(w, http.StatusNotFound, "extra not found: "+name)
+		return
+	}
+	for _, t := range extras[idx].Targets {
+		if t.Path == body.Path {
+			writeError(w, http.StatusConflict, "target already exists: "+body.Path)
+			return
+		}
+	}
+
+	et := config.ExtraTargetConfig{Path: body.Path, Flatten: body.Flatten}
+	if body.Mode != "" {
+		et.Mode = body.Mode
+	}
+	extras[idx].Targets = append(extras[idx].Targets, et)
+
+	if err := s.saveAndReloadConfig(); err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	s.writeOpsLog("extras-target", "ok", start, map[string]any{
+		"name": name, "target": body.Path, "action": "add", "scope": "ui",
+	}, "")
+
+	writeJSON(w, map[string]any{"success": true, "name": name, "target": body.Path})
+}
+
+// handleExtrasRemoveTarget — DELETE /api/extras/{name}/targets
+// Removes one target from an existing extra. Config-only — the UI does not
+// prune disk files (mirrors the whole-extra DELETE contract).
+func (s *Server) handleExtrasRemoveTarget(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	name := r.PathValue("name")
+
+	var body struct {
+		Path string `json:"path"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid JSON body")
+		return
+	}
+	if body.Path == "" {
+		writeError(w, http.StatusBadRequest, "path is required")
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	extras := s.extrasConfig()
+	idx := -1
+	for i := range extras {
+		if extras[i].Name == name {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
+		writeError(w, http.StatusNotFound, "extra not found: "+name)
+		return
+	}
+	tIdx := -1
+	for j, t := range extras[idx].Targets {
+		if t.Path == body.Path {
+			tIdx = j
+			break
+		}
+	}
+	if tIdx == -1 {
+		writeError(w, http.StatusNotFound, "target not found: "+body.Path)
+		return
+	}
+	if len(extras[idx].Targets) == 1 {
+		writeError(w, http.StatusBadRequest, "cannot remove the last target; delete the extra instead")
+		return
+	}
+
+	extras[idx].Targets = append(extras[idx].Targets[:tIdx], extras[idx].Targets[tIdx+1:]...)
+
+	if err := s.saveAndReloadConfig(); err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	s.writeOpsLog("extras-target", "ok", start, map[string]any{
+		"name": name, "target": body.Path, "action": "remove", "scope": "ui",
+	}, "")
+
+	writeJSON(w, map[string]any{"success": true, "name": name, "target": body.Path})
+}
