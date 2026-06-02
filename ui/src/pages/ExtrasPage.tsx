@@ -280,6 +280,49 @@ function AddExtraModal({
   );
 }
 
+// ─── AddTargetRow ─────────────────────────────────────────────────────────────
+
+function AddTargetRow({ onAdd }: { onAdd: (path: string, mode: string) => Promise<void> }) {
+  const t = useT();
+  const [path, setPath] = useState('');
+  const [mode, setMode] = useState('merge');
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="ml-5 mt-2 flex items-center gap-2">
+      <Input
+        value={path}
+        onChange={(e) => setPath(e.target.value)}
+        placeholder={t('extras.modal.targetPathPlaceholder')}
+        size="sm"
+        className="flex-1"
+      />
+      <Select
+        value={mode}
+        onChange={(v) => setMode(v)}
+        options={MODE_OPTIONS}
+        size="sm"
+        className="w-32 shrink-0"
+      />
+      <Button
+        variant="ghost"
+        size="sm"
+        disabled={busy || path.trim() === ''}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await onAdd(path.trim(), mode);
+            setPath('');
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <Plus size={14} strokeWidth={2.5} /> {t('extras.addTarget')}
+      </Button>
+    </div>
+  );
+}
+
 // ─── ExtraCard ────────────────────────────────────────────────────────────────
 
 function ExtraCard({
@@ -288,6 +331,8 @@ function ExtraCard({
   onForceSync,
   onRemove,
   onModeChange,
+  onAddTarget,
+  onRemoveTarget,
   availableExtensions,
 }: {
   extra: Extra;
@@ -296,6 +341,8 @@ function ExtraCard({
   onForceSync: (name: string) => Promise<void>;
   onRemove: (name: string) => void;
   onModeChange: (name: string, target: string, mode: string, flatten?: boolean, extension?: string) => Promise<void>;
+  onAddTarget: (name: string, path: string, mode: string) => Promise<void>;
+  onRemoveTarget: (name: string, path: string) => Promise<void>;
   availableExtensions: string[];
 }) {
   const t = useT();
@@ -477,12 +524,23 @@ function ExtraCard({
                   disabled={changingMode === tgt.path}
                 />
               )}
+              {extra.targets.length > 1 && (
+                <IconButton
+                  icon={<Trash2 size={14} strokeWidth={2.5} />}
+                  label={t('extras.removeTarget')}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onRemoveTarget(extra.name, tgt.path)}
+                  className="hover:text-danger shrink-0"
+                />
+              )}
             </div>
           ))
         ) : (
           <p className="text-sm text-pencil-light italic">{t('extras.noTargets')}</p>
         )}
       </div>
+      <AddTargetRow onAdd={(path, mode) => onAddTarget(extra.name, path, mode)} />
     </Card>
   );
 }
@@ -611,6 +669,26 @@ export default function ExtrasPage() {
     }
   };
 
+  const handleAddTarget = async (name: string, path: string, mode: string) => {
+    try {
+      await api.addExtraTarget(name, { path, mode });
+      toast(tr('extras.toast.targetAdded', { path }, `Added target ${path}`), 'success');
+      invalidate();
+    } catch (err: any) {
+      toast(err.message, 'error');
+    }
+  };
+
+  const handleRemoveTarget = async (name: string, path: string) => {
+    try {
+      await api.removeExtraTarget(name, path);
+      toast(tr('extras.toast.targetRemoved', { path }, `Removed target ${path}`), 'success');
+      invalidate();
+    } catch (err: any) {
+      toast(err.message, 'error');
+    }
+  };
+
   const handleCreated = () => {
     setShowAdd(false);
     invalidate();
@@ -691,6 +769,8 @@ export default function ExtrasPage() {
                   onForceSync={(name) => handleSync(name, true)}
                   onRemove={(name) => setRemoveName(name)}
                   onModeChange={handleModeChange}
+                  onAddTarget={handleAddTarget}
+                  onRemoveTarget={handleRemoveTarget}
                   availableExtensions={availableExtensions}
                 />
               ))}
