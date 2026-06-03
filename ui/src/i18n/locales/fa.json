@@ -786,6 +786,7 @@
   "preview.source": "منبع",
   "preview.license": "مجوز",
   "preview.noContent": "محتوای SKILL.md موجود نیست",
+  "preview.fallbackNotice": "پیش‌نمایش کامل برای این منبع در دسترس نیست — فقط فراداده‌های فهرست نمایش داده می‌شود.",
   "resourceDetail.actions.disable": "غیرفعال کردن",
   "resourceDetail.actions.disabling": "در حال غیرفعال‌سازی...",
   "resourceDetail.actions.edit": "ویرایش",

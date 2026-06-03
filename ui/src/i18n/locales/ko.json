@@ -786,6 +786,7 @@
   "preview.source": "출처",
   "preview.license": "라이선스",
   "preview.noContent": "SKILL.md 내용이 없습니다",
+  "preview.fallbackNotice": "이 소스는 전체 미리보기를 사용할 수 없습니다. 색인 메타데이터만 표시합니다.",
   "resourceDetail.actions.disable": "비활성화",
   "resourceDetail.actions.disabling": "비활성화 중...",
   "resourceDetail.actions.edit": "편집",

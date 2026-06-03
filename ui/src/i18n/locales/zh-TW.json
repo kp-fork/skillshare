@@ -786,6 +786,7 @@
   "preview.source": "來源",
   "preview.license": "授權",
   "preview.noContent": "沒有 SKILL.md 內容",
+  "preview.fallbackNotice": "此來源無法提供完整預覽，僅顯示索引中繼資料。",
   "resourceDetail.actions.disable": "停用",
   "resourceDetail.actions.disabling": "停用中…",
   "resourceDetail.actions.edit": "編輯",

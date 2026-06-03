@@ -632,6 +632,7 @@
   "preview.source": "Source",
   "preview.license": "License",
   "preview.noContent": "No SKILL.md content available",
+  "preview.fallbackNotice": "Full preview isn't available for this source — showing index metadata only.",
   "newSkill.back": "Back",
   "newSkill.step.category": "Category",
   "newSkill.step.confirm": "Confirm",

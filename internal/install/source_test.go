@@ -1582,3 +1582,33 @@ func TestParseSource_AzureDevOps_GitHubOwnerEmpty(t *testing.T) {
 		})
 	}
 }
+
+func TestSource_GitHubAPIBase(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"github.com shorthand", "owner/repo", "https://api.github.com"},
+		{"github.com full URL", "https://github.com/owner/repo", "https://api.github.com"},
+		{"github.com SSH", "git@github.com:owner/repo.git", "https://api.github.com"},
+		{"GHE Server", "https://github.mycompany.com/org/repo", "https://github.mycompany.com/api/v3"},
+		{"GHE Server shorthand", "github.acme.com/team/project", "https://github.acme.com/api/v3"},
+		{"GHE Cloud .ghe.com", "https://octocorp.ghe.com/org/repo", "https://api.octocorp.ghe.com"},
+		{"GHE SSH", "git@github.mycompany.com:org/repo.git", "https://github.mycompany.com/api/v3"},
+		{"GitLab is not GitHub", "https://gitlab.com/group/project", ""},
+		{"Bitbucket is not GitHub", "https://bitbucket.org/team/repo", ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			source, err := ParseSource(tt.input)
+			if err != nil {
+				t.Fatalf("ParseSource(%q) error: %v", tt.input, err)
+			}
+			if got := source.GitHubAPIBase(); got != tt.want {
+				t.Errorf("GitHubAPIBase() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

@@ -786,6 +786,7 @@
   "preview.source": "Sumber",
   "preview.license": "Lisensi",
   "preview.noContent": "Tidak ada konten SKILL.md tersedia",
+  "preview.fallbackNotice": "Pratinjau lengkap tidak tersedia untuk sumber ini — hanya menampilkan metadata indeks.",
   "resourceDetail.actions.disable": "Nonaktifkan",
   "resourceDetail.actions.disabling": "Menonaktifkan...",
   "resourceDetail.actions.edit": "Edit",

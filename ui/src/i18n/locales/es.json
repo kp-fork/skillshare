@@ -786,6 +786,7 @@
   "preview.source": "Fuente",
   "preview.license": "Licencia",
   "preview.noContent": "No hay contenido SKILL.md disponible",
+  "preview.fallbackNotice": "La vista previa completa no está disponible para esta fuente; solo se muestran los metadatos del índice.",
   "resourceDetail.actions.disable": "Desactivar",
   "resourceDetail.actions.disabling": "Desactivando...",
   "resourceDetail.actions.edit": "Editar",

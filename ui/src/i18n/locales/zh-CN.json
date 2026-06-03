@@ -786,6 +786,7 @@
   "preview.source": "来源",
   "preview.license": "许可证",
   "preview.noContent": "没有 SKILL.md 内容",
+  "preview.fallbackNotice": "此来源无法提供完整预览，仅显示索引元数据。",
   "resourceDetail.actions.disable": "禁用",
   "resourceDetail.actions.disabling": "禁用中...",
   "resourceDetail.actions.edit": "编辑",

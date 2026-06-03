@@ -588,40 +588,59 @@ func (s *Source) GitHubRepo() string {
 }
 
 func (s *Source) gitHubOwnerRepo() (owner, repo string) {
+	_, owner, repo = s.gitHubHostOwnerRepo()
+	return owner, repo
+}
+
+// GitHubAPIBase returns the REST API base URL for GitHub-family sources
+// (https://api.github.com for github.com, https://api.<host>.ghe.com for
+// GHE Cloud/Data Residency, or https://<host>/api/v3 for GHE Server).
+// Returns "" for non-GitHub hosts or unparsable URLs.
+func (s *Source) GitHubAPIBase() string {
+	host, _, _ := s.gitHubHostOwnerRepo()
+	if host == "" {
+		return ""
+	}
+	return gitHubAPIBaseForHost(host)
+}
+
+// gitHubHostOwnerRepo extracts the host, owner, and repo from a GitHub-family
+// clone URL (HTTPS or SSH). Returns empty strings for non-GitHub hosts.
+func (s *Source) gitHubHostOwnerRepo() (host, owner, repo string) {
 	cloneURL := strings.TrimSpace(s.CloneURL)
 	if cloneURL == "" {
-		return "", ""
+		return "", "", ""
 	}
 
 	// SSH clone URL: user@host:owner/repo.git
 	if sshMatches := gitSSHPattern.FindStringSubmatch(cloneURL); sshMatches != nil {
-		host := strings.ToLower(strings.TrimSpace(sshMatches[2]))
+		host = strings.ToLower(strings.TrimSpace(sshMatches[2]))
 		if !isGitHubLikeHost(host) {
-			return "", ""
+			return "", "", ""
 		}
-		return sshMatches[3], strings.TrimSuffix(sshMatches[4], ".git")
+		return host, sshMatches[3], strings.TrimSuffix(sshMatches[4], ".git")
 	}
 
 	u, err := url.Parse(cloneURL)
 	if err != nil {
-		return "", ""
+		return "", "", ""
 	}
-	host := strings.ToLower(u.Hostname())
+	host = strings.ToLower(u.Hostname())
 	if !isGitHubLikeHost(host) {
-		return "", ""
+		return "", "", ""
 	}
 
 	parts := strings.Split(strings.Trim(u.Path, "/"), "/")
 	if len(parts) < 2 {
-		return "", ""
+		return "", "", ""
 	}
 
 	owner = parts[0]
 	repo = strings.TrimSuffix(parts[1], ".git")
 	if owner == "" || repo == "" {
-		return "", ""
+		return "", "", ""
 	}
-	return owner, repo
+	return host, owner, repo
 }
 
 // TrackName returns a unique name for --track mode by joining path segments with "-".

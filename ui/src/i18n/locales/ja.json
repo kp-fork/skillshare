@@ -786,6 +786,7 @@
   "preview.source": "ソース",
   "preview.license": "ライセンス",
   "preview.noContent": "SKILL.mdコンテンツがありません",
+  "preview.fallbackNotice": "このソースは完全なプレビューを利用できません。インデックスのメタデータのみ表示しています。",
   "resourceDetail.actions.disable": "無効化",
   "resourceDetail.actions.disabling": "無効化中...",
   "resourceDetail.actions.edit": "編集",
