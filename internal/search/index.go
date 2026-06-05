@@ -34,14 +34,21 @@ type indexSkill struct {
 	RiskLabel   string   `json:"riskLabel,omitempty"`
 }
 
+type hubSourceContext struct {
+	sshUser string
+	sshHost string
+	sshPort string
+}
+
 // SearchFromIndexURL searches skills from a private index.json URL or local path.
 // A limit of 0 means no limit (return all results).
 func SearchFromIndexURL(query string, limit int, indexURL string) ([]SearchResult, error) {
+	hubCtx := hubSourceContextFromURL(indexURL)
 	doc, err := loadIndex(indexURL)
 	if err != nil {
 		return nil, err
 	}
-	return searchIndex(query, limit, doc)
+	return searchIndex(query, limit, doc, hubCtx)
 }
 
 // SearchFromIndexJSON searches skills from raw index JSON data.
@@ -52,10 +59,10 @@ func SearchFromIndexJSON(query string, limit int, data []byte) ([]SearchResult, 
 	if err := json.Unmarshal(data, &doc); err != nil {
 		return nil, invalidHubJSONError("", err)
 	}
-	return searchIndex(query, limit, &doc)
+	return searchIndex(query, limit, &doc, hubSourceContext{})
 }
 
-func searchIndex(query string, limit int, doc *indexDocument) ([]SearchResult, error) {
+func searchIndex(query string, limit int, doc *indexDocument, hubCtx hubSourceContext) ([]SearchResult, error) {
 	sourcePath := strings.TrimSpace(doc.SourcePath)
 
 	q := strings.ToLower(strings.TrimSpace(query))
@@ -77,6 +84,7 @@ func searchIndex(query string, limit int, doc *indexDocument) ([]SearchResult, e
 		if sourcePath != "" && isRelativeSource(source) {
 			source = filepath.Join(sourcePath, source)
 		}
+		source = rewriteSourceForSSHHub(source, hubCtx)
 
 		if q != "" {
 			hay := strings.ToLower(name + "\n" + it.Description + "\n" + source + "\n" + strings.Join(it.Tags, " "))
@@ -107,6 +115,48 @@ func searchIndex(query string, limit int, doc *indexDocument) ([]SearchResult, e
 	return results, nil
 }
 
+func hubSourceContextFromURL(indexURL string) hubSourceContext {
+	user, host, ok := install.SSHIdentity(indexURL)
+	if !ok {
+		return hubSourceContext{}
+	}
+	ctx := hubSourceContext{sshUser: user, sshHost: host}
+	if u, err := url.Parse(strings.TrimSpace(indexURL)); err == nil && strings.EqualFold(u.Scheme, "ssh") {
+		ctx.sshPort = u.Port()
+	}
+	return ctx
+}
+
+func rewriteSourceForSSHHub(source string, hubCtx hubSourceContext) string {
+	if hubCtx.sshUser == "" || hubCtx.sshHost == "" || !isDomainPrefixedSource(source) {
+		return source
+	}
+
+	src, err := install.ParseSource(source)
+	if err != nil || src.GitHubAPIBase() == "" {
+		return source
+	}
+	if !strings.EqualFold(cloneHost(src.CloneURL), hubCtx.sshHost) {
+		return source
+	}
+
+	owner, repo := src.GitHubOwner(), src.GitHubRepo()
+	if owner == "" || repo == "" {
+		return source
+	}
+
+	var rewritten string
+	if hubCtx.sshPort != "" {
+		rewritten = fmt.Sprintf("ssh://%s@%s:%s/%s/%s.git", hubCtx.sshUser, hubCtx.sshHost, hubCtx.sshPort, owner, repo)
+	} else {
+		rewritten = fmt.Sprintf("%s@%s:%s/%s.git", hubCtx.sshUser, hubCtx.sshHost, owner, repo)
+	}
+	if subdir := strings.TrimLeft(src.Subdir, "/"); subdir != "" {
+		rewritten += "//" + subdir
+	}
+	return rewritten
+}
+
 // isRelativeSource returns true if the source looks like a relative path
 // rather than a remote URL or absolute path.
 func isRelativeSource(source string) bool {
@@ -135,6 +185,40 @@ func isRelativeSource(source string) bool {
 		return false
 	}
 	return true
+}
+
+func isDomainPrefixedSource(source string) bool {
+	s := strings.TrimSpace(source)
+	if s == "" ||
+		strings.HasPrefix(s, "/") ||
+		strings.HasPrefix(s, "~") ||
+		strings.HasPrefix(s, "./") ||
+		strings.HasPrefix(s, "../") ||
+		strings.HasPrefix(s, "http://") ||
+		strings.HasPrefix(s, "https://") ||
+		strings.HasPrefix(s, "file://") ||
+		install.IsSSHURL(s) {
+		return false
+	}
+	if len(s) >= 3 && s[1] == ':' &&
+		((s[0] >= 'A' && s[0] <= 'Z') || (s[0] >= 'a' && s[0] <= 'z')) &&
+		(s[2] == '/' || s[2] == '\\') {
+		return false
+	}
+	if strings.HasPrefix(s, `\\`) {
+		return false
+	}
+
+	firstSlash := strings.Index(s, "/")
+	return firstSlash > 0 && strings.Contains(s[:firstSlash], ".")
+}
+
+func cloneHost(cloneURL string) string {
+	u, err := url.Parse(strings.TrimSpace(cloneURL))
+	if err != nil {
+		return ""
+	}
+	return strings.ToLower(u.Hostname())
 }
 
 // invalidHubJSONError wraps a JSON decode failure with guidance that the
@@ -381,6 +465,13 @@ func hubHTTPError(indexURL string, status int) error {
 }
 
 func parseOwnerRepo(source string) (owner, repo string) {
+	if src, err := install.ParseSource(source); err == nil {
+		owner, repo = src.GitHubOwner(), src.GitHubRepo()
+		if owner != "" && repo != "" {
+			return owner, repo
+		}
+	}
+
 	s := strings.TrimPrefix(source, "https://")
 	s = strings.TrimPrefix(s, "http://")
 	s = strings.TrimPrefix(s, "github.com/")

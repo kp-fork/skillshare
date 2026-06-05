@@ -298,6 +298,58 @@ func TestParseSource_GitSSH(t *testing.T) {
 	}
 }
 
+func TestSSHIdentity(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		wantUser string
+		wantHost string
+		wantOK   bool
+	}{
+		{
+			name:     "scp style",
+			input:    "acme@acme.ghe.com:Org/skills.git//hubs/team.json",
+			wantUser: "acme",
+			wantHost: "acme.ghe.com",
+			wantOK:   true,
+		},
+		{
+			name:     "ssh scheme",
+			input:    "ssh://git@ghe.corp.com/Org/skills.git//skillshare-hub.json",
+			wantUser: "git",
+			wantHost: "ghe.corp.com",
+			wantOK:   true,
+		},
+		{
+			name:   "https",
+			input:  "https://ghe.corp.com/Org/skills",
+			wantOK: false,
+		},
+		{
+			name:   "ssh scheme without user",
+			input:  "ssh://ghe.corp.com/Org/skills.git",
+			wantOK: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			user, host, ok := SSHIdentity(tt.input)
+			if ok != tt.wantOK {
+				t.Fatalf("ok = %v, want %v", ok, tt.wantOK)
+			}
+			if ok {
+				if user != tt.wantUser {
+					t.Errorf("user = %q, want %q", user, tt.wantUser)
+				}
+				if host != tt.wantHost {
+					t.Errorf("host = %q, want %q", host, tt.wantHost)
+				}
+			}
+		})
+	}
+}
+
 func TestParseSource_GitHTTPS(t *testing.T) {
 	tests := []struct {
 		name         string

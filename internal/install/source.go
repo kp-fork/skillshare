@@ -95,6 +95,23 @@ func IsSSHURL(input string) bool {
 	return strings.HasPrefix(s, "ssh://") || gitSSHPattern.MatchString(s)
 }
 
+// SSHIdentity extracts the SSH username and hostname from scp-style or
+// scheme-style SSH sources. It returns ok=false when either part is absent.
+func SSHIdentity(input string) (user, host string, ok bool) {
+	s := strings.TrimSpace(input)
+	if matches := gitSSHPattern.FindStringSubmatch(s); matches != nil {
+		user = strings.TrimSpace(matches[1])
+		host = strings.ToLower(strings.TrimSpace(matches[2]))
+		return user, host, user != "" && host != ""
+	}
+	if matches := sshURLPattern.FindStringSubmatch(s); matches != nil {
+		user = strings.TrimSpace(matches[1])
+		host = strings.ToLower(strings.TrimSpace(matches[2]))
+		return user, host, user != "" && host != ""
+	}
+	return "", "", false
+}
+
 // ParseSource analyzes the input string and returns a Source struct.
 // Uses default (zero) ParseOptions.
 func ParseSource(input string) (*Source, error) {

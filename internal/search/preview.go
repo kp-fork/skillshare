@@ -46,6 +46,10 @@ func FetchPreview(client *http.Client, source, branch string) (*SkillPreview, er
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrPreviewUnsupported, err)
 	}
+	return fetchPreviewFromSource(client, src, source, branch)
+}
+
+func fetchPreviewFromSource(client *http.Client, src *install.Source, source, branch string) (*SkillPreview, error) {
 	if branch == "" {
 		branch = src.Branch
 	}
@@ -53,7 +57,14 @@ func FetchPreview(client *http.Client, source, branch string) (*SkillPreview, er
 	if apiBase := src.GitHubAPIBase(); apiBase != "" {
 		owner, repo := src.GitHubOwner(), src.GitHubRepo()
 		if owner != "" && repo != "" {
-			return fetchViaContentsAPI(client, apiBase, src.CloneURL, owner, repo, src.Subdir, branch)
+			if src.Type == install.SourceTypeGitSSH && previewToken(src.CloneURL, apiBase) == "" {
+				return fetchViaClone(src, source, branch)
+			}
+			preview, err := fetchViaContentsAPI(client, apiBase, src.CloneURL, owner, repo, src.Subdir, branch)
+			if err == nil || src.Type != install.SourceTypeGitSSH {
+				return preview, err
+			}
+			return fetchViaClone(src, source, branch)
 		}
 	}
 	return fetchViaClone(src, source, branch)
@@ -255,10 +266,26 @@ func previewToken(cloneURL, apiBase string) string {
 	if t, _ := install.ResolveTokenForURL(cloneURL); t != "" {
 		return t
 	}
+	if lookupURL := previewTokenLookupURL(cloneURL); lookupURL != "" {
+		if t, _ := install.ResolveTokenForURL(lookupURL); t != "" {
+			return t
+		}
+	}
 	if apiBase == "https://api.github.com" {
 		return ghclient.GetToken()
 	}
 	return ""
+}
+
+func previewTokenLookupURL(cloneURL string) string {
+	if _, host, ok := install.SSHIdentity(cloneURL); ok {
+		return "https://" + host + "/"
+	}
+	u, err := url.Parse(strings.TrimSpace(cloneURL))
+	if err != nil || u.Hostname() == "" {
+		return ""
+	}
+	return "https://" + u.Hostname() + "/"
 }
 
 // newContentsRequest builds a GET request for the GitHub/GHE REST API with the

@@ -9,6 +9,17 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.20.8] - 2026-06-05
+
+### Bug Fixes
+
+- **SSH GitHub Enterprise hub entries inherit the hub SSH login** — when an SSH hub returns same-host GitHub or GitHub Enterprise domain-prefixed sources, search results now install them over SSH using the hub username and host. For example, a hub loaded from `acme@acme.ghe.com:Org/skills.git//hubs/team.json` can return `acme.ghe.com/Org/skills/skills/reviewer`, and Skillshare installs it as `acme@acme.ghe.com:Org/skills.git//skills/reviewer`. Explicit HTTPS/SSH sources, cross-host entries, local paths, and in-memory indexes keep their existing behavior. Refs: #196.
+- **SSH skill previews can read private hub results** — previews for SSH GitHub/GHE sources now fall back to a shallow clone when no token is available or the Contents API rejects the request, so the dashboard can show full `SKILL.md` content for SSH-only private hub results instead of only index metadata.
+
+### Performance
+
+- **Faster `.skillignore` globstar matching** — repeated `**` patterns no longer trigger exponential backtracking, so commands that scan ignored skills stay responsive with complex ignore rules.
+
 ## [0.20.7] - 2026-06-03
 
 ### Bug Fixes

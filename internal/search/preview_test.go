@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -164,6 +165,101 @@ func TestFetchViaClone_NotFound(t *testing.T) {
 	if !errors.Is(err, ErrSkillNotFound) {
 		t.Fatalf("err = %v, want ErrSkillNotFound", err)
 	}
+}
+
+func TestFetchPreviewFromSource_SSHWithoutTokenUsesClone(t *testing.T) {
+	t.Setenv("GITHUB_TOKEN", "")
+	t.Setenv("GH_TOKEN", "")
+	t.Setenv("SKILLSHARE_GIT_TOKEN", "")
+
+	repo := initGitRepoWithFile(t, "skills/foo/SKILL.md", sampleSkillMD)
+	src := &install.Source{
+		Type:     install.SourceTypeGitSSH,
+		Raw:      repo + "//skills/foo",
+		CloneURL: repo,
+		Subdir:   "skills/foo",
+	}
+
+	preview, err := fetchPreviewFromSource(http.DefaultClient, src, "git@example.com:o/r.git//skills/foo", "")
+	if err != nil {
+		t.Fatalf("fetchPreviewFromSource: %v", err)
+	}
+	if preview.Name != "foo" {
+		t.Errorf("Name = %q, want foo", preview.Name)
+	}
+	if !strings.Contains(preview.Content, "Body content.") {
+		t.Errorf("Content missing body: %q", preview.Content)
+	}
+}
+
+func TestFetchPreviewFromSource_SSHContentsAPIFailureFallsBackToClone(t *testing.T) {
+	t.Setenv("GITHUB_TOKEN", "ghp_test")
+
+	repo := initGitRepoWithFile(t, "skills/foo/SKILL.md", sampleSkillMD)
+	t.Setenv("GIT_CONFIG_COUNT", "1")
+	t.Setenv("GIT_CONFIG_KEY_0", "url."+repo+".insteadOf")
+	t.Setenv("GIT_CONFIG_VALUE_0", "git@github.com:o/r.git")
+
+	apiRequests := 0
+	api := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apiRequests++
+		if got := r.Header.Get("Authorization"); got != "token ghp_test" {
+			t.Errorf("Authorization = %q, want token ghp_test", got)
+		}
+		w.WriteHeader(http.StatusForbidden)
+	}))
+	defer api.Close()
+
+	apiURL, err := url.Parse(api.URL)
+	if err != nil {
+		t.Fatalf("parse test api URL: %v", err)
+	}
+	client := &http.Client{Transport: rewriteHostTransport{target: apiURL}}
+	src := &install.Source{
+		Type:     install.SourceTypeGitSSH,
+		Raw:      "git@github.com:o/r.git//skills/foo",
+		CloneURL: "git@github.com:o/r.git",
+		Subdir:   "skills/foo",
+	}
+
+	preview, err := fetchPreviewFromSource(client, src, "git@github.com:o/r.git//skills/foo", "")
+	if err != nil {
+		t.Fatalf("fetchPreviewFromSource: %v", err)
+	}
+	if preview.Name != "foo" {
+		t.Errorf("Name = %q, want foo", preview.Name)
+	}
+	if preview.Owner != "o" {
+		t.Errorf("Owner = %q, want o", preview.Owner)
+	}
+	if preview.Repo != "r" {
+		t.Errorf("Repo = %q, want r", preview.Repo)
+	}
+	if apiRequests == 0 {
+		t.Fatal("expected SSH preview with token to try Contents API before clone fallback")
+	}
+}
+
+func TestPreviewToken_ResolvesEnvForSSHGitHubSource(t *testing.T) {
+	t.Setenv("GITHUB_TOKEN", "ghp_test")
+	t.Setenv("GH_TOKEN", "")
+	t.Setenv("SKILLSHARE_GIT_TOKEN", "")
+
+	got := previewToken("git@github.com:o/r.git", "https://api.github.com")
+	if got != "ghp_test" {
+		t.Fatalf("previewToken() = %q, want ghp_test", got)
+	}
+}
+
+type rewriteHostTransport struct {
+	target *url.URL
+}
+
+func (t rewriteHostTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	clone := req.Clone(req.Context())
+	clone.URL.Scheme = t.target.Scheme
+	clone.URL.Host = t.target.Host
+	return http.DefaultTransport.RoundTrip(clone)
 }
 
 func TestFindSkillFile(t *testing.T) {
