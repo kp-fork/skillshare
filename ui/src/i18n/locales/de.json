@@ -1326,5 +1326,20 @@
   "newSkill.category.infra.label": "Infrastructure Operations",
   "skillEditor.outline.label": "Gliederung",
   "skillEditor.outline.show": "Gliederung anzeigen",
-  "skillEditor.outline.close": "Gliederung schließen"
+  "skillEditor.outline.close": "Gliederung schließen",
+  "resources.select.toggle": "Auswählen",
+  "resources.select.done": "Fertig",
+  "resources.select.selectAll": "Alle auswählen",
+  "resources.select.clear": "Löschen",
+  "resources.select.count": "{count} ausgewählt",
+  "resources.batchToggle.enable": "Aktivieren",
+  "resources.batchToggle.disable": "Deaktivieren",
+  "resources.batchToggle.confirmTitle": "{count} Ressourcen deaktivieren?",
+  "resources.batchToggle.confirmButton": "{count} deaktivieren",
+  "resources.batchToggle.confirmMessage": "Diese Ressourcen werden deaktiviert und bei der nächsten Synchronisierung von allen Zielen ausgeschlossen. Du kannst sie jederzeit wieder aktivieren.",
+  "resources.batchToggle.toast.enabled": "{count} Ressourcen aktiviert",
+  "resources.batchToggle.toast.disabled": "{count} Ressourcen deaktiviert",
+  "resources.batchToggle.toast.partial": "{updated} aktualisiert, {failed} fehlgeschlagen",
+  "resources.batchToggle.toast.failed": "{count} Ressourcen konnten nicht aktualisiert werden",
+  "resources.batchToggle.toast.noChange": "Keine Änderungen"
 }

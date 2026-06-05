@@ -1326,5 +1326,20 @@
   "tour.steps.sync-actions.description": "Sync skills from source to all targets. Preview with Diff before executing.",
   "tour.steps.sync-actions.title": "Sync Operations",
   "tour.steps.targets-grid.description": "Your AI CLI tools (Claude, Cursor, etc.). Each target can be configured with its own sync mode.",
-  "tour.steps.targets-grid.title": "Targets"
+  "tour.steps.targets-grid.title": "Targets",
+  "resources.select.toggle": "Select",
+  "resources.select.done": "Done",
+  "resources.select.selectAll": "Select all",
+  "resources.select.clear": "Clear",
+  "resources.select.count": "{count} selected",
+  "resources.batchToggle.enable": "Enable",
+  "resources.batchToggle.disable": "Disable",
+  "resources.batchToggle.confirmTitle": "Disable {count} resources?",
+  "resources.batchToggle.confirmButton": "Disable {count}",
+  "resources.batchToggle.confirmMessage": "These resources will be disabled and excluded from all targets on the next sync. You can re-enable them anytime.",
+  "resources.batchToggle.toast.enabled": "Enabled {count} resources",
+  "resources.batchToggle.toast.disabled": "Disabled {count} resources",
+  "resources.batchToggle.toast.partial": "{updated} updated, {failed} failed",
+  "resources.batchToggle.toast.failed": "Failed to update {count} resources",
+  "resources.batchToggle.toast.noChange": "No changes applied"
 }

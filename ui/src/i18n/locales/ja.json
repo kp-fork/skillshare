@@ -1326,5 +1326,20 @@
   "newSkill.category.infra.label": "Infrastructure Operations",
   "skillEditor.outline.label": "アウトライン",
   "skillEditor.outline.show": "アウトラインを表示",
-  "skillEditor.outline.close": "アウトラインを閉じる"
+  "skillEditor.outline.close": "アウトラインを閉じる",
+  "resources.select.toggle": "選択",
+  "resources.select.done": "完了",
+  "resources.select.selectAll": "すべて選択",
+  "resources.select.clear": "クリア",
+  "resources.select.count": "{count} 件選択中",
+  "resources.batchToggle.enable": "有効化",
+  "resources.batchToggle.disable": "無効化",
+  "resources.batchToggle.confirmTitle": "{count} 件のリソースを無効化しますか？",
+  "resources.batchToggle.confirmButton": "{count} 件を無効化",
+  "resources.batchToggle.confirmMessage": "これらのリソースは無効化され、次回の同期ですべてのターゲットから除外されます。いつでも再度有効化できます。",
+  "resources.batchToggle.toast.enabled": "{count} 件のリソースを有効化しました",
+  "resources.batchToggle.toast.disabled": "{count} 件のリソースを無効化しました",
+  "resources.batchToggle.toast.partial": "{updated} 件更新、{failed} 件失敗",
+  "resources.batchToggle.toast.failed": "{count} 件のリソースの更新に失敗しました",
+  "resources.batchToggle.toast.noChange": "変更はありません"
 }

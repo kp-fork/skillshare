@@ -1326,5 +1326,20 @@
   "newSkill.category.infra.label": "Infrastructure Operations",
   "skillEditor.outline.label": "Esquema",
   "skillEditor.outline.show": "Mostrar esquema",
-  "skillEditor.outline.close": "Cerrar esquema"
+  "skillEditor.outline.close": "Cerrar esquema",
+  "resources.select.toggle": "Seleccionar",
+  "resources.select.done": "Listo",
+  "resources.select.selectAll": "Seleccionar todo",
+  "resources.select.clear": "Borrar",
+  "resources.select.count": "{count} seleccionados",
+  "resources.batchToggle.enable": "Activar",
+  "resources.batchToggle.disable": "Desactivar",
+  "resources.batchToggle.confirmTitle": "¿Desactivar {count} recursos?",
+  "resources.batchToggle.confirmButton": "Desactivar {count}",
+  "resources.batchToggle.confirmMessage": "Estos recursos se desactivarán y se excluirán de todos los destinos en la próxima sincronización. Puedes volver a activarlos en cualquier momento.",
+  "resources.batchToggle.toast.enabled": "{count} recursos activados",
+  "resources.batchToggle.toast.disabled": "{count} recursos desactivados",
+  "resources.batchToggle.toast.partial": "{updated} actualizados, {failed} fallidos",
+  "resources.batchToggle.toast.failed": "No se pudieron actualizar {count} recursos",
+  "resources.batchToggle.toast.noChange": "Sin cambios"
 }

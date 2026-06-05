@@ -1326,5 +1326,20 @@
   "newSkill.category.infra.label": "Infrastructure Operations",
   "skillEditor.outline.label": "Kerangka",
   "skillEditor.outline.show": "Tampilkan kerangka",
-  "skillEditor.outline.close": "Tutup kerangka"
+  "skillEditor.outline.close": "Tutup kerangka",
+  "resources.select.toggle": "Pilih",
+  "resources.select.done": "Selesai",
+  "resources.select.selectAll": "Pilih semua",
+  "resources.select.clear": "Hapus",
+  "resources.select.count": "{count} dipilih",
+  "resources.batchToggle.enable": "Aktifkan",
+  "resources.batchToggle.disable": "Nonaktifkan",
+  "resources.batchToggle.confirmTitle": "Nonaktifkan {count} sumber daya?",
+  "resources.batchToggle.confirmButton": "Nonaktifkan {count}",
+  "resources.batchToggle.confirmMessage": "Sumber daya ini akan dinonaktifkan dan dikecualikan dari semua target pada sinkronisasi berikutnya. Anda dapat mengaktifkannya kembali kapan saja.",
+  "resources.batchToggle.toast.enabled": "{count} sumber daya diaktifkan",
+  "resources.batchToggle.toast.disabled": "{count} sumber daya dinonaktifkan",
+  "resources.batchToggle.toast.partial": "{updated} diperbarui, {failed} gagal",
+  "resources.batchToggle.toast.failed": "Gagal memperbarui {count} sumber daya",
+  "resources.batchToggle.toast.noChange": "Tidak ada perubahan"
 }

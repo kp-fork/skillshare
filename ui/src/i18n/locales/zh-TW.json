@@ -1326,5 +1326,20 @@
   "newSkill.category.infra.label": "Infrastructure Operations",
   "skillEditor.outline.label": "大綱",
   "skillEditor.outline.show": "顯示大綱",
-  "skillEditor.outline.close": "關閉大綱"
+  "skillEditor.outline.close": "關閉大綱",
+  "resources.select.toggle": "選取",
+  "resources.select.done": "完成",
+  "resources.select.selectAll": "全選",
+  "resources.select.clear": "清除",
+  "resources.select.count": "已選取 {count} 項",
+  "resources.batchToggle.enable": "啟用",
+  "resources.batchToggle.disable": "停用",
+  "resources.batchToggle.confirmTitle": "停用 {count} 個資源？",
+  "resources.batchToggle.confirmButton": "停用 {count} 個",
+  "resources.batchToggle.confirmMessage": "這些資源將被停用,並在下次同步時從所有目標排除。你可以隨時重新啟用。",
+  "resources.batchToggle.toast.enabled": "已啟用 {count} 個資源",
+  "resources.batchToggle.toast.disabled": "已停用 {count} 個資源",
+  "resources.batchToggle.toast.partial": "{updated} 個已更新,{failed} 個失敗",
+  "resources.batchToggle.toast.failed": "{count} 個資源更新失敗",
+  "resources.batchToggle.toast.noChange": "沒有變更"
 }

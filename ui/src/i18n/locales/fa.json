@@ -1326,5 +1326,20 @@
   "newSkill.category.infra.label": "Infrastructure Operations",
   "skillEditor.outline.label": "فهرست مطالب",
   "skillEditor.outline.show": "نمایش فهرست مطالب",
-  "skillEditor.outline.close": "بستن فهرست مطالب"
+  "skillEditor.outline.close": "بستن فهرست مطالب",
+  "resources.select.toggle": "انتخاب",
+  "resources.select.done": "تمام",
+  "resources.select.selectAll": "انتخاب همه",
+  "resources.select.clear": "پاک کردن",
+  "resources.select.count": "{count} مورد انتخاب شد",
+  "resources.batchToggle.enable": "فعال‌سازی",
+  "resources.batchToggle.disable": "غیرفعال‌سازی",
+  "resources.batchToggle.confirmTitle": "{count} منبع غیرفعال شود؟",
+  "resources.batchToggle.confirmButton": "غیرفعال‌سازی {count}",
+  "resources.batchToggle.confirmMessage": "این منابع غیرفعال می‌شوند و در همگام‌سازی بعدی از همهٔ مقصدها حذف خواهند شد. می‌توانید هر زمان دوباره آن‌ها را فعال کنید.",
+  "resources.batchToggle.toast.enabled": "{count} منبع فعال شد",
+  "resources.batchToggle.toast.disabled": "{count} منبع غیرفعال شد",
+  "resources.batchToggle.toast.partial": "{updated} به‌روزرسانی شد، {failed} ناموفق",
+  "resources.batchToggle.toast.failed": "به‌روزرسانی {count} منبع ناموفق بود",
+  "resources.batchToggle.toast.noChange": "هیچ تغییری اعمال نشد"
 }

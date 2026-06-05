@@ -261,6 +261,11 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ folder, target: target ?? '' }),
     }),
+  batchToggleResources: (names: string[], enable: boolean, kind?: 'skill' | 'agent') =>
+    apiFetch<BatchToggleResult>('/resources/batch/toggle', {
+      method: 'POST',
+      body: JSON.stringify({ names, enable, kind }),
+    }),
   setSkillTargets: (name: string, target: string | null) =>
     apiFetch<{ success: boolean }>(`/resources/${encodeURIComponent(name)}/targets`, {
       method: 'PATCH',
@@ -978,6 +983,18 @@ export interface BatchUninstallItemResult {
 export interface BatchUninstallResult {
   results: BatchUninstallItemResult[];
   summary: { succeeded: number; failed: number };
+}
+
+export interface BatchToggleItemResult {
+  name: string;
+  success: boolean;
+  disabled: boolean;
+  error?: string;
+}
+
+export interface BatchToggleResult {
+  results: BatchToggleItemResult[];
+  summary: { updated: number; unchanged: number; failed: number };
 }
 
 export interface LocalSkillInfo {
