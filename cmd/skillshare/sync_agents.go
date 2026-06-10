@@ -135,6 +135,9 @@ func resolveAgentTargetPath(tc config.TargetConfig, builtinAgents map[string]con
 	if builtin, ok := builtinAgents[name]; ok {
 		return config.ExpandPath(builtin.Path)
 	}
+	if builtin, ok := config.LookupGlobalAgentTarget(name); ok {
+		return config.ExpandPath(builtin.Path)
+	}
 	return ""
 }
 

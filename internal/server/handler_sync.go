@@ -187,7 +187,7 @@ func (s *Server) handleSync(w http.ResponseWriter, r *http.Request) {
 			builtinAgents := s.builtinAgentTargets()
 
 			for name, target := range s.cfg.Targets {
-				agentPath := resolveAgentPath(target, builtinAgents, name)
+				agentPath := resolveAgentPath(target, builtinAgents, name, s.IsProjectMode())
 				if agentPath == "" {
 					continue
 				}

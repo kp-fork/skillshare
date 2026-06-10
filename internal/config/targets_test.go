@@ -175,6 +175,24 @@ func TestProjectAgentTargets_NonV1Excluded(t *testing.T) {
 	}
 }
 
+func TestLookupAgentTarget_Alias(t *testing.T) {
+	global, ok := LookupGlobalAgentTarget("factory")
+	if !ok {
+		t.Fatal("LookupGlobalAgentTarget should find alias 'factory'")
+	}
+	if global.Path == "" {
+		t.Fatal("expected non-empty global agent path for factory")
+	}
+
+	project, ok := LookupProjectAgentTarget("factory")
+	if !ok {
+		t.Fatal("LookupProjectAgentTarget should find alias 'factory'")
+	}
+	if project.Path != ".factory/droids" {
+		t.Fatalf("factory project agent path = %q, want %q", project.Path, ".factory/droids")
+	}
+}
+
 func TestProjectTargetDotDirs_IncludesAgentPaths(t *testing.T) {
 	dirs := ProjectTargetDotDirs()
 
