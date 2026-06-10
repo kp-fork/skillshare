@@ -197,7 +197,7 @@ func (s *Server) handleSync(w http.ResponseWriter, r *http.Request) {
 					agentMode = "merge"
 				}
 
-				agentResult, err := ssync.SyncAgents(agents, agentsSource, agentPath, agentMode, body.DryRun, body.Force)
+				agentResult, err := ssync.SyncAgents(agents, agentsSource, agentPath, agentMode, body.DryRun, body.Force, s.projectRoot)
 				if err != nil {
 					warnings = append(warnings, "agent sync failed for "+name+": "+err.Error())
 					continue
