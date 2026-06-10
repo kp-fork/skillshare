@@ -183,7 +183,7 @@ When specifying a subdirectory path like `owner/repo/skill-name`, if the exact p
 
 ## Install from Config (No Arguments)
 
-When run without a source argument, `skillshare install` reads the `skills:` section from `config.yaml` and installs all listed remote skills that don't already exist locally:
+When run without a source argument, `skillshare install` reads the recorded remote skill metadata (global mode) or the project `skills:` manifest (project mode) and installs all remote skills that don't already exist locally:
 
 ```bash
 # Global — reads ~/.config/skillshare/config.yaml
@@ -193,11 +193,11 @@ skillshare install
 skillshare install -p
 ```
 
-This makes `config.yaml` a **portable skill manifest** — share it to reproduce the same skill setup on any machine:
+This makes the recorded metadata/manifest a **portable skill setup** — share it to reproduce the same skills on any machine:
 
 ```bash
 # New machine setup
-skillshare install       # Installs all skills from config
+skillshare install       # Rehydrates remote skills and tracked repos from metadata
 skillshare sync          # Sync to targets
 
 # New team member onboarding
@@ -206,7 +206,7 @@ skillshare install -p    # Install all remote skills from project config
 skillshare sync
 ```
 
-Skills with `tracked: true` are cloned with full git history (same as `--track`), so `skillshare update` works correctly. Skills already present on disk are skipped.
+Skills with `tracked: true` are cloned with full git history (same as `--track`), so `skillshare update` works correctly. Skills already present on disk are skipped. This is the recovery command to run after a fresh clone when tracked repo directories were gitignored and are missing locally.
 
 :::tip push/pull vs install from config
 `push`/`pull` syncs actual skill **files** via git. `install` from config re-downloads from **source URLs**. They're complementary — see [Cross-Machine Sync](/docs/how-to/sharing/cross-machine-sync#alternative-install-from-config) for when to use which.

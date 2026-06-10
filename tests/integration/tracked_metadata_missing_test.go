@@ -51,8 +51,9 @@ func TestTrackedMetadataMissingClone_StatusJSONReportsMissingRepo(t *testing.T) 
 
 	var output struct {
 		TrackedRepos []struct {
-			Name   string `json:"name"`
-			Status string `json:"status"`
+			Name    string `json:"name"`
+			Status  string `json:"status"`
+			Message string `json:"message"`
 		} `json:"tracked_repos"`
 	}
 	if err := json.Unmarshal([]byte(result.Stdout), &output); err != nil {
@@ -67,6 +68,10 @@ func TestTrackedMetadataMissingClone_StatusJSONReportsMissingRepo(t *testing.T) 
 	}
 	if output.TrackedRepos[0].Status != "missing" {
 		t.Fatalf("expected missing tracked repo status, got %q", output.TrackedRepos[0].Status)
+	}
+	message := strings.ToLower(output.TrackedRepos[0].Message)
+	if !strings.Contains(message, "missing") || !strings.Contains(output.TrackedRepos[0].Message, "skillshare install") {
+		t.Fatalf("expected actionable missing-repo message with skillshare install suggestion, got %q", output.TrackedRepos[0].Message)
 	}
 }
 
@@ -98,8 +103,9 @@ func TestTrackedMetadataMissingClone_CheckJSONReportsMissingRepo(t *testing.T) {
 	if output.TrackedRepos[0].Status != "missing" {
 		t.Fatalf("expected missing tracked repo status, got %q", output.TrackedRepos[0].Status)
 	}
-	if !strings.Contains(strings.ToLower(output.TrackedRepos[0].Message), "missing") {
-		t.Fatalf("expected actionable missing-repo message, got %q", output.TrackedRepos[0].Message)
+	message := strings.ToLower(output.TrackedRepos[0].Message)
+	if !strings.Contains(message, "missing") || !strings.Contains(output.TrackedRepos[0].Message, "skillshare install") {
+		t.Fatalf("expected actionable missing-repo message with skillshare install suggestion, got %q", output.TrackedRepos[0].Message)
 	}
 }
 
@@ -134,7 +140,51 @@ func TestTrackedMetadataMissingClone_UpdateAllJSONSkipsMissingRepo(t *testing.T)
 	if item.Name != missingTrackedRepoName || item.Type != "repo" || item.Status != "skipped" {
 		t.Fatalf("expected skipped repo item for %q, got %+v", missingTrackedRepoName, item)
 	}
-	if !strings.Contains(strings.ToLower(item.Error), "missing") {
-		t.Fatalf("expected missing-repo error message, got %q", item.Error)
+	message := strings.ToLower(item.Error)
+	if !strings.Contains(message, "missing") || !strings.Contains(item.Error, "skillshare install") {
+		t.Fatalf("expected missing-repo error message with skillshare install suggestion, got %q", item.Error)
 	}
+}
+
+func TestTrackedMetadataMissingClone_DoctorJSONWarnsWithInstallSuggestion(t *testing.T) {
+	sb := testutil.NewSandbox(t)
+	defer sb.Cleanup()
+	setupMissingTrackedRepoMetadata(t, sb)
+
+	result := sb.RunCLI("doctor", "--json")
+	result.AssertSuccess(t)
+
+	var output struct {
+		Checks []struct {
+			Name        string   `json:"name"`
+			Status      string   `json:"status"`
+			Message     string   `json:"message"`
+			Details     []string `json:"details"`
+			Suggestions []string `json:"suggestions"`
+		} `json:"checks"`
+	}
+	if err := json.Unmarshal([]byte(result.Stdout), &output); err != nil {
+		t.Fatalf("failed to parse JSON output: %v\nstdout: %s", err, result.Stdout)
+	}
+
+	for _, check := range output.Checks {
+		if check.Name != "tracked_repos" {
+			continue
+		}
+		if check.Status != "warning" {
+			t.Fatalf("expected tracked_repos warning, got %q", check.Status)
+		}
+		if !strings.Contains(check.Message, "tracked") || !strings.Contains(strings.ToLower(check.Message), "missing") {
+			t.Fatalf("expected missing tracked repo message, got %q", check.Message)
+		}
+		if len(check.Details) == 0 || !strings.Contains(check.Details[0], missingTrackedRepoName) {
+			t.Fatalf("expected missing repo detail for %q, got %v", missingTrackedRepoName, check.Details)
+		}
+		if len(check.Suggestions) == 0 || !strings.Contains(check.Suggestions[0], "skillshare install") {
+			t.Fatalf("expected skillshare install suggestion, got %v", check.Suggestions)
+		}
+		return
+	}
+
+	t.Fatalf("expected tracked_repos doctor check in output: %+v", output.Checks)
 }
