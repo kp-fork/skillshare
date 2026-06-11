@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.20.13] - 2026-06-11
+
+### New Features
+
+#### Web Dashboard
+
+- **Rehydrate missing tracked repos from the dashboard** — the Updates page now shows a warning banner listing tracked repos declared in `.metadata.json` whose clone directories are missing on disk, with a one-click **Rehydrate** button that re-clones them from metadata. The Dashboard's **Update All** also warns about missing repos and points to rehydrate, instead of reporting that there is nothing to update. Refs: #212.
+
+### Bug Fixes
+
+- **`update --all` reports missing tracked repos in batch and project mode** — reporting a missing tracked repo previously only worked when it was the single update target; when `update --all` covered multiple items (the common case) the batch path skipped missing repos silently, and project mode (`-p`) never detected them at all. Both now surface each missing repo with a warning and a one-shot rehydrate hint:
+  ```bash
+  skillshare update --all          # ! _team-skills  clone directory absent
+  skillshare install               # rehydrate from metadata
+  ```
+  `update --all --json` now carries an aggregated `missing_tracked_repos` summary (names + hint), and the per-item error is the concise `clone directory absent`. Refs: #212.
+
 ## [0.20.12] - 2026-06-11
 
 ### New Features
