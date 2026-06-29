@@ -9,6 +9,13 @@ All notable changes to skillshare are documented here. For the full commit histo
 
 ---
 
+## [0.20.21] - 2026-06-29
+
+### Bug Fixes
+
+- **Copy-mode sync respects file ignore patterns** — `sync` in `copy` mode now skips configured `ignore:` artifacts, plus default `.DS_Store`, `.git/`, and `__pycache__/` files, across CLI sync, diff, and dashboard sync/diff paths. This prevents ignored cache and build artifacts from being copied into targets or changing copy-mode checksums.
+- **Global sync uses the default skills source when source is omitted** — global configs that only define targets now work with `skillshare sync --global`, using the default `~/.config/skillshare/skills` source instead of failing with `source path is empty`. Refs: #238.
+
 ## [0.20.20] - 2026-06-19
 
 ### Bug Fixes
