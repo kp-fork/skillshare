@@ -21,17 +21,23 @@ func TestValidateConfig_SourceNotExist(t *testing.T) {
 	}
 }
 
-func TestValidateConfig_SourceEmpty(t *testing.T) {
+func TestValidateConfig_DefaultSource_OK(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Setenv("XDG_CONFIG_HOME", tmpDir)
+	defaultSource := filepath.Join(tmpDir, "skillshare", "skills")
+	if err := os.MkdirAll(defaultSource, 0755); err != nil {
+		t.Fatal(err)
+	}
 	cfg := &Config{
 		Source:  "",
 		Targets: map[string]TargetConfig{},
 	}
-	_, err := ValidateConfig(cfg)
-	if err == nil {
-		t.Fatal("expected error for empty source")
+	warnings, err := ValidateConfig(cfg)
+	if err != nil {
+		t.Fatalf("unexpected error for default source: %v", err)
 	}
-	if !strings.Contains(err.Error(), "source path is empty") {
-		t.Errorf("unexpected error: %v", err)
+	if len(warnings) > 0 {
+		t.Errorf("unexpected warnings: %v", warnings)
 	}
 }
 

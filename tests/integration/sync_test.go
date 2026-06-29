@@ -153,6 +153,29 @@ targets:
 	result.AssertAnyOutputContains(t, "source path does not exist")
 }
 
+func TestSync_GlobalDefaultSourceWhenOmitted(t *testing.T) {
+	sb := testutil.NewSandbox(t)
+	defer sb.Cleanup()
+
+	sb.CreateSkill("default-source-skill", map[string]string{
+		"SKILL.md": "# Default Source Skill",
+	})
+	targetPath := sb.CreateTarget("claude")
+
+	sb.WriteConfig(`targets:
+  claude:
+    skills:
+      path: ` + targetPath + `
+`)
+
+	result := sb.RunCLI("sync", "--global")
+
+	result.AssertSuccess(t)
+	if !sb.IsSymlink(filepath.Join(targetPath, "default-source-skill")) {
+		t.Error("skill from default source should be synced")
+	}
+}
+
 func TestSync_SymlinkMode_CreatesSingleSymlink(t *testing.T) {
 	sb := testutil.NewSandbox(t)
 	defer sb.Cleanup()
